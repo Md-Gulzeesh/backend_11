@@ -10,7 +10,55 @@ productRouter.get("/bookmarks", async (req, res) => {
   const products = await ProductModel.find({Bookmark:true});
   res.send(products);
 });
+productRouter.get("/search", async (req, res) => {
+    let query = req.query.q;
+    if(query !== undefined){
+      let product = await ProductModel.find({Title:{ $regex: query }});
+      if(product.length !== 0){
+        res.send(product);
+      }else{
+        res.status(404).send("Product is not available");
+      }
+    }else{
+      res.status(500).send("Please type your query");
+    }
+});
+productRouter.get("/sort", async (req, res) => {
+    let query = req.query.q;
+    if(query !== undefined){
+      if(query === "SortBylatest"){
+        let product = await ProductModel.find({}).sort({Date_and_TimeStamp:-1});
+        if(product.length !== 0){
+          res.send(product);
+        }else{
+          res.status(404).send("Product is not available");
+        }
+      }else{
+        let product = await ProductModel.find({}).sort({Date_and_TimeStamp: 1});
+        if(product.length !== 0){
+          res.send(product);
+        }else{
+          res.status(404).send("Product is not available");
+        }
 
+      }
+    }else{
+      res.status(500).send("Please type your query");
+    }
+});
+productRouter.get("/priority", async (req, res) => {
+    let query = req.query.p;
+    if (query !== undefined) {
+      let product = await ProductModel.find({ Priority: query });
+      if (product.length !== 0) {
+        res.send(product);
+      } else {
+        res.status(404).send("Product is not available");
+      }
+    } else {
+      res.status(500).send("Please type your priority");
+    }
+});
 productRouter.get("/:productID", async (req, res) => {
   ProductModel.findById(req.params.productID, (err, data) => {
     if (err) {
